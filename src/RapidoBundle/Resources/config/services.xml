@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="rapido_adapter.doctrine_dbal_storage.table_name_generator" class="Avoran\RapidoAdapter\DoctrineDbalStorage\NameGenerator" public="false">
+            <argument>%rapido.table_name_prefix%</argument>
+        </service>
+        <service id="rapido_adapter.doctrine_dbal_storage.dbal_type_mapper" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DbalTypeMapper" public="false" />
+        <service id="rapido_adapter.doctrine_dbal_storage.dbal_options_mapper" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DbalOptionsMapper" public="false" />
+
+        <service id="rapido_adapter.doctrine_dbal_storage.schema_manager" class="Doctrine\DBAL\Schema\SqliteSchemaManager" public="false">
+            <argument type="service" id="database_connection" />
+        </service>
+        <service id="rapido_adapter.doctrine_dbal_storage.comparator" class="Doctrine\DBAL\Schema\Comparator" public="false" />
+        <service id="rapido_adapter.doctrine_dbal_storage.column_factory" class="Avoran\RapidoAdapter\DoctrineDbalStorage\ColumnFactory" public="false">
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.dbal_type_mapper" />
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.dbal_options_mapper" />
+        </service>
+
+        <service id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\SchemaSynchronizer" public="false">
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.schema_manager" />
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.comparator" />
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.table_name_generator" />
+            <argument>%rapido.id_column_name%</argument>
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.column_factory" />
+        </service>
+
+        <service id="rapido.storage_writer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DoctrineDbalStorageWriter">
+            <argument type="service" id="database_connection" />
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" />
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.table_name_generator" />
+            <argument>%rapido.id_column_name%</argument>
+            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.dbal_type_mapper" />
+        </service>
+    </services>
+</container>

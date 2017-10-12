@@ -1,0 +1,13 @@
+framework:
+  secret: test
+
+services:
+  database_connection:
+    class: Doctrine\DBAL\Connection
+    factory: [ 'Doctrine\DBAL\DriverManager', getConnection ]
+    arguments:
+      - { driver: 'pdo_sqlite', path: '%kernel.project_dir%/tests/RapidoBundle/Config/sqlite.db' }
+
+rapido:
+  table_name_prefix: 'test_'
+  id_column_name: 'identifier'

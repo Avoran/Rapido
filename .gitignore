@@ -1,0 +1,6 @@
+/vendor/
+composer.lock
+coverage.xml
+tests/RapidoBundle/Config/sqlite.db
+tests/RapidoBundle/Config/cache/
+tests/RapidoBundle/Config/logs/

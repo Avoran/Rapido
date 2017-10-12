@@ -1,0 +1,34 @@
+{
+  "name": "avoran/rapido",
+  "description": "Readmodel library for event stores",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Avoran",
+      "email": "avoran@protonmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "doctrine/dbal": "^2.5",
+    "symfony/framework-bundle": "^3.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Avoran\\Rapido\\": "src/Rapido",
+      "Avoran\\RapidoAdapter\\": "src/RapidoAdapter",
+      "Avoran\\RapidoBundle\\": "src/RapidoBundle"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Avoran\\Rapido\\": "tests/Rapido",
+      "Avoran\\RapidoAdapter\\": "tests/RapidoAdapter",
+      "Avoran\\RapidoBundle\\": "tests/RapidoBundle"
+    }
+  }
+}
