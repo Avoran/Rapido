@@ -1,6 +1,8 @@
 <?php
 
+use Avoran\RapidoBundle\Config\Compiler\CompilerPass;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
 class TestKernel extends Kernel
@@ -17,5 +19,12 @@ class TestKernel extends Kernel
     {
         new \PDO('sqlite:' . __DIR__ . '/sqlite.db');
         $loader->load(__DIR__ . '/config.yml');
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new CompilerPass());
     }
 }
