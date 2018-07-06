@@ -6,6 +6,7 @@
     <services>
         <service id="rapido_adapter.doctrine_dbal_storage.table_name_generator" class="Avoran\RapidoAdapter\DoctrineDbalStorage\NameGenerator" public="false">
             <argument>%rapido.table_name_prefix%</argument>
+            <argument>%rapido.table_name_suffix%</argument>
         </service>
         <service id="rapido_adapter.doctrine_dbal_storage.dbal_type_mapper" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DbalTypeMapper" public="false" />
         <service id="rapido_adapter.doctrine_dbal_storage.dbal_options_mapper" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DbalOptionsMapper" public="false" />

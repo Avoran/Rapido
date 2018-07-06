@@ -49,8 +49,8 @@ class StorageWriterTest extends KernelTestCase
 
         $this->writer->writeRecord($meta, ['id' => 1, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('test_test')->execute()->fetchAll());
-        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('test_test')->execute()->fetch());
+        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAll());
+        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
     }
 
     /** @test */
@@ -70,8 +70,8 @@ class StorageWriterTest extends KernelTestCase
 
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('test_test')->where('identifier = 2')->execute()->fetchColumn(0));
-        $this->assertCount(4, $this->connection->createQueryBuilder()->select('*')->from('test_test')->execute()->fetch());
+        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('prefix_test')->where('identifier = 2')->execute()->fetchColumn(0));
+        $this->assertCount(4, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
     }
 
     /** @test */
@@ -90,7 +90,27 @@ class StorageWriterTest extends KernelTestCase
 
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test2']);
 
-        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('test_test')->where('identifier = 2')->execute()->fetchColumn(0));
-        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('test_test')->execute()->fetch());
+        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('prefix_test')->where('identifier = 2')->execute()->fetchColumn(0));
+        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
+    }
+
+    /** @test */
+    public function it_should_create_a_snapshot_table()
+    {
+        $meta = new ReadModelConfiguration(
+            'test',
+            new ReadModelId(new Integer()),
+            [
+                new ReadModelField('f1', new Boolean()),
+                new ReadModelField('f2', new TextString(10)),
+            ],
+            function ($data) { return new Record($data['id'], ['f1' => $data['f1'], 'f2' => $data['f2']]); },
+            function () {},
+            'created_at'
+        );
+
+        $this->writer->writeRecord($meta, ['id' => 1, 'f1' => true, 'f2' => 'test']);
+
+        $this->assertEquals(1, $this->connection->fetchColumn("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='prefix_test_suffix'"));
     }
 }

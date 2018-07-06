@@ -2,6 +2,7 @@
 
 namespace Avoran\RapidoAdapter\DoctrineDbalStorage;
 
+use Avoran\Rapido\ReadModel\DataType\DateTime;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
@@ -34,30 +35,52 @@ class SchemaSynchronizer
 
     public function ensureTableExists(ReadModelConfiguration $metadata)
     {
-        $targetTable = new Table(
-            $this->tableNameGenerator->generate($metadata->getName()),
-            array_merge([$this->columnFactory->createColumn($metadata->getId()->getDataType(), $this->idColumnName)],
-                array_map(function(ReadModelField $field) {
-                    return $this->columnFactory->createColumn($field->getDataType(), $field->getId());
-                }, $metadata->getFields())
-            )
-        );
-        $targetTable->setPrimaryKey([$this->idColumnName]);
+        $table = $this->generateTable($metadata);
+        $table->setPrimaryKey([$this->idColumnName]);
 
+        $this->updateTable($table);
+
+        if (!$metadata->generateSnapshot()) return;
+
+        $table = $this->generateTable($metadata, true);
+        $table->setPrimaryKey([$this->idColumnName, $metadata->getSnapshotColumnName()]);
+
+        $this->updateTable($table);
+    }
+
+    private function generateTable(ReadModelConfiguration $metadata, $snapshot = false)
+    {
+        $predefinedColumns = [$this->columnFactory->createColumn($metadata->getId()->getDataType(), $this->idColumnName)];
+        $name = $this->tableNameGenerator->generate($metadata->getName());
+
+        if ($snapshot) {
+            $predefinedColumns[] = $this->columnFactory->createColumn(new DateTime(), $metadata->getSnapshotColumnName());
+            $name = $this->tableNameGenerator->generateWithSuffix($metadata->getName());
+        }
+
+        return new Table($name,
+            array_merge($predefinedColumns, array_map(function(ReadModelField $field) {
+                return $this->columnFactory->createColumn($field->getDataType(), $field->getId());
+            }, $metadata->getFields()))
+        );
+    }
+
+    private function updateTable(Table $table)
+    {
         $existingTables = array_filter(
             $this->schemaManager->listTables(),
-            function(Table $existingTable) use ($targetTable) { return $targetTable->getName() == $existingTable->getName(); }
+            function(Table $existingTable) use ($table) { return $table->getName() == $existingTable->getName(); }
         );
 
         if (count($existingTables) > 1)
-            throw new \UnexpectedValueException(sprintf("Multiple tables with the name '%s' exist.", $targetTable->getName()));
+            throw new \UnexpectedValueException(sprintf("Multiple tables with the name '%s' exist.", $table->getName()));
 
         if (count($existingTables) == 1) {
-            $tableDiff = $this->schemaComparator->diffTable(current($existingTables), $targetTable);
+            $tableDiff = $this->schemaComparator->diffTable(current($existingTables), $table);
             if ($tableDiff)
                 $this->schemaManager->alterTable($tableDiff);
         } else {
-            $this->schemaManager->createTable($targetTable);
+            $this->schemaManager->createTable($table);
         }
     }
 }

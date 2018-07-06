@@ -9,5 +9,6 @@ services:
       - { driver: 'pdo_sqlite', path: '%kernel.project_dir%/tests/RapidoBundle/Config/sqlite.db' }
 
 rapido:
-  table_name_prefix: 'test_'
+  table_name_prefix: 'prefix_'
+  table_name_suffix: '_suffix'
   id_column_name: 'identifier'
