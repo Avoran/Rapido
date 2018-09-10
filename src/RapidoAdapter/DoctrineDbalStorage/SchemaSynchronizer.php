@@ -53,12 +53,13 @@ class SchemaSynchronizer
     {
         $predefinedColumns = [$this->columnFactory->createColumn($metadata->getId()->getDataType(), $this->idColumnName)];
         $name = $this->tableNameGenerator->generate($metadata->getName());
-        $indices = [new Index(sprintf('IDX_%s', $this->idColumnName), [$this->idColumnName], false, true)];
 
         if ($snapshot) {
             $predefinedColumns[] = $this->columnFactory->createColumn(new DateTime(), $metadata->getSnapshotColumnName());
             $name = $this->tableNameGenerator->generateWithSuffix($metadata->getName());
-            $indices[] = new Index(sprintf('IDX_%s', $metadata->getSnapshotColumnName()), [$metadata->getSnapshotColumnName()]);
+            $indices = [new Index(sprintf('IDX_%s', $metadata->getSnapshotColumnName()), [$metadata->getSnapshotColumnName()])];
+        } else {
+            $indices = [new Index(sprintf('IDX_%s', $this->idColumnName), [$this->idColumnName])];
         }
 
         return new Table($name,
