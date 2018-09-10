@@ -5,6 +5,7 @@ namespace Avoran\RapidoAdapter\DoctrineDbalStorage;
 use Avoran\Rapido\ReadModel\DataType\DateTime;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Avoran\Rapido\ReadModel\ReadModelConfiguration;
 use Avoran\Rapido\ReadModel\ReadModelField;
@@ -52,16 +53,19 @@ class SchemaSynchronizer
     {
         $predefinedColumns = [$this->columnFactory->createColumn($metadata->getId()->getDataType(), $this->idColumnName)];
         $name = $this->tableNameGenerator->generate($metadata->getName());
+        $indices = [new Index(sprintf('IDX_%s', $this->idColumnName), $this->idColumnName, false, true)];
 
         if ($snapshot) {
             $predefinedColumns[] = $this->columnFactory->createColumn(new DateTime(), $metadata->getSnapshotColumnName());
             $name = $this->tableNameGenerator->generateWithSuffix($metadata->getName());
+            $indices[] = new Index(sprintf('IDX_%s', $metadata->getSnapshotColumnName()), $metadata->getSnapshotColumnName());
         }
 
         return new Table($name,
             array_merge($predefinedColumns, array_map(function(ReadModelField $field) {
                 return $this->columnFactory->createColumn($field->getDataType(), $field->getId());
-            }, $metadata->getFields()))
+            }, $metadata->getFields())),
+            $indices
         );
     }
 
