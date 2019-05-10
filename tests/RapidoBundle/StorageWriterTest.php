@@ -54,6 +54,24 @@ class StorageWriterTest extends KernelTestCase
     }
 
     /** @test */
+    public function it_should_create_an_indexed_table()
+    {
+        $meta = new ReadModelConfiguration(
+            'test',
+            new ReadModelId(new Integer()),
+            [
+                new ReadModelField('f1', new TextString(10), true),
+            ],
+            function ($data) { return new Record($data['id'], ['f1' => $data['f1']]); },
+            function () {}
+        );
+
+        $this->writer->writeRecord($meta, ['id' => 1, 'f1' => 'test']);
+
+        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('sqlite_master')->where("type = 'index' and name = 'IDX_f1'")->execute()->fetchAll());
+    }
+
+    /** @test */
     public function it_should_update_the_table_on_record_change()
     {
         $meta = new ReadModelConfiguration(

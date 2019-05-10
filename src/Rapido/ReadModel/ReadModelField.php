@@ -12,9 +12,13 @@ final class ReadModelField
     private $dataType;
     public function getDataType() { return $this->dataType; }
 
-    public function __construct($id, FieldDataType $dataType)
+    private $index;
+    public function useIndex() { return $this->index; }
+
+    public function __construct($id, FieldDataType $dataType, $index = false)
     {
         $this->id = $id;
         $this->dataType = $dataType;
+        $this->index = $index;
     }
 }
