@@ -4,21 +4,17 @@ namespace Avoran\RapidoBundle;
 
 use Avoran\RapidoAdapter\DoctrineDbalStorage\DoctrineDbalStorageWriter;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ServiceDefinitionTest extends KernelTestCase
 {
-    /** @var ContainerInterface */
-    private $container;
-
     protected function setUp()
     {
-        $this->container = self::bootKernel()->getContainer();
+        self::bootKernel();
     }
 
     /** @test */
     public function kernel_should_boot()
     {
-        $this->assertInstanceOf(DoctrineDbalStorageWriter::class, $this->container->get('rapido.storage_writer'));
+        $this->assertInstanceOf(DoctrineDbalStorageWriter::class, self::$kernel->getContainer()->get('rapido.storage_writer'));
     }
 }
