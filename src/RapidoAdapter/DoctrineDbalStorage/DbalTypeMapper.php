@@ -9,6 +9,7 @@ use Avoran\Rapido\ReadModel\DataType\Decimal;
 use Avoran\Rapido\ReadModel\DataType\FieldDataType;
 use Avoran\Rapido\ReadModel\DataType\Integer;
 use Avoran\Rapido\ReadModel\DataType\TextString;
+use Doctrine\DBAL\Types\Types;
 
 class DbalTypeMapper
 {
@@ -16,18 +17,18 @@ class DbalTypeMapper
     {
         switch ($fieldDataType) {
             case $fieldDataType instanceof Integer:
-                return Type::getType(Type::INTEGER);
+                return Type::getType(Types::INTEGER);
             case $fieldDataType instanceof Decimal:
-                return Type::getType(Type::DECIMAL);
+                return Type::getType(Types::DECIMAL);
             case $fieldDataType instanceof Boolean:
-                return Type::getType(Type::BOOLEAN);
+                return Type::getType(Types::BOOLEAN);
             case $fieldDataType instanceof TextString:
                 return $fieldDataType->getMaxLength() && $fieldDataType->getMaxLength() < 256
-                    ? Type::getType(Type::STRING)
-                    : Type::getType(Type::TEXT)
+                    ? Type::getType(Types::STRING)
+                    : Type::getType(Types::TEXT)
                 ;
             case $fieldDataType instanceof DateTime:
-                return Type::getType(Type::DATETIME);
+                return Type::getType(Types::DATETIME_MUTABLE);
             default:
                 throw new \InvalidArgumentException("Could not find a suitable data type");
         }

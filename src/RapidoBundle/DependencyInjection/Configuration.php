@@ -9,10 +9,9 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('rapido');
+        $treeBuilder = new TreeBuilder('rapido');
 
-        $rootNode
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('table_name_prefix')
                     ->defaultValue('read_model_')
