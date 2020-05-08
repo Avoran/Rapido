@@ -28,7 +28,7 @@
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.column_factory" />
         </service>
 
-        <service id="rapido.storage_writer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DoctrineDbalStorageWriter">
+        <service id="rapido.storage_writer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DoctrineDbalStorageWriter" public="true">
             <argument type="service" id="database_connection" />
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" />
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.table_name_generator" />

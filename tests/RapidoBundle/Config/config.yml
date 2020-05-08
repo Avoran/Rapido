@@ -3,6 +3,7 @@ framework:
 
 services:
   database_connection:
+    public: true
     class: Doctrine\DBAL\Connection
     factory: [ 'Doctrine\DBAL\DriverManager', getConnection ]
     arguments:
