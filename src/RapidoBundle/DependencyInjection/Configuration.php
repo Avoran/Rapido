@@ -22,6 +22,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('id_column_name')
                     ->defaultValue('id')
                 ->end()
+                ->scalarNode('database_connection')
+                    ->defaultValue('database_connection')
+                ->end()
             ->end()
         ;
 

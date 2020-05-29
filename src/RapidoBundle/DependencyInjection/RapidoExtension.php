@@ -16,6 +16,7 @@ class RapidoExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('rapido.table_name_prefix', $config['table_name_prefix']);
         $container->setParameter('rapido.table_name_suffix', $config['table_name_suffix']);
         $container->setParameter('rapido.id_column_name', $config['id_column_name']);
+        $container->setAlias('rapido.database_connection', $config['database_connection']);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
