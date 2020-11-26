@@ -20,7 +20,7 @@
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.dbal_options_mapper" />
         </service>
 
-        <service id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\SchemaSynchronizer" public="false">
+        <service id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\SchemaSynchronizer" public="true">
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.schema_manager" />
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.comparator" />
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.table_name_generator" />
@@ -30,7 +30,6 @@
 
         <service id="rapido.storage_writer" class="Avoran\RapidoAdapter\DoctrineDbalStorage\DoctrineDbalStorageWriter" public="true">
             <argument type="service" id="rapido.database_connection" />
-            <argument type="service" id="rapido_adapter.doctrine_dbal_storage.schema_synchronizer" />
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.table_name_generator" />
             <argument>%rapido.id_column_name%</argument>
             <argument type="service" id="rapido_adapter.doctrine_dbal_storage.dbal_type_mapper" />

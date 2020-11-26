@@ -13,8 +13,6 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 class DoctrineDbalStorageWriter implements StorageWriter
 {
     private $connection;
-    private $checkedSchema = [];
-    private $schemaSynchronizer;
     private $tableNameGenerator;
     private $idColumnName;
     private $dbalTypeMapper;
@@ -22,14 +20,12 @@ class DoctrineDbalStorageWriter implements StorageWriter
     public function __construct
     (
         Connection $connection,
-        SchemaSynchronizer $tableGenerator,
         NameGenerator $tableNameGenerator,
         $idColumnName,
         DbalTypeMapper $dbalTypeMapper
     )
     {
         $this->connection = $connection;
-        $this->schemaSynchronizer = $tableGenerator;
         $this->tableNameGenerator = $tableNameGenerator;
         $this->idColumnName = $idColumnName;
         $this->dbalTypeMapper = $dbalTypeMapper;
@@ -37,11 +33,6 @@ class DoctrineDbalStorageWriter implements StorageWriter
 
     public function writeRecord(ReadModelConfiguration $metadata, $recordData)
     {
-        if (!isset($this->checkedSchema[$metadata->getName()])) {
-            $this->schemaSynchronizer->ensureTableExists($metadata);
-            $this->checkedSchema[$metadata->getName()] = true;
-        }
-
         $tableName = $this->tableNameGenerator->generate($metadata->getName());
         $record = $metadata->createRecord($recordData);
 

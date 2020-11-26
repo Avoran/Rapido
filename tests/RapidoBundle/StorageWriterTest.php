@@ -10,6 +10,7 @@ use Avoran\Rapido\ReadModel\ReadModelField;
 use Avoran\Rapido\ReadModel\ReadModelId;
 use Avoran\Rapido\ReadModel\Record;
 use Avoran\Rapido\ReadModel\StorageWriter;
+use Avoran\RapidoAdapter\DoctrineDbalStorage\SchemaSynchronizer;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -21,6 +22,9 @@ class StorageWriterTest extends KernelTestCase
     /** @var Connection */
     private $connection;
 
+    /** @var SchemaSynchronizer */
+    private $synchronizer;
+
     public static function setUpBeforeClass()
     {
         unlink(__DIR__ . '/Config/sqlite.db');
@@ -31,6 +35,7 @@ class StorageWriterTest extends KernelTestCase
         $container = self::bootKernel()->getContainer();
         $this->writer = $container->get('rapido.storage_writer');
         $this->connection = $container->get('database_connection');
+        $this->synchronizer = $container->get('rapido_adapter.doctrine_dbal_storage.schema_synchronizer');
     }
 
     /** @test */
@@ -47,10 +52,11 @@ class StorageWriterTest extends KernelTestCase
             function () {}
         );
 
+        $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 1, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAll());
-        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
+        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAllAssociative());
+        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAssociative());
     }
 
     /** @test */
@@ -66,9 +72,10 @@ class StorageWriterTest extends KernelTestCase
             function () {}
         );
 
+        $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 1, 'f1' => 'test']);
 
-        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('sqlite_master')->where("type = 'index' and name = 'IDX_f1'")->execute()->fetchAll());
+        $this->assertCount(1, $this->connection->createQueryBuilder()->select('*')->from('sqlite_master')->where("type = 'index' and name = 'IDX_f1'")->execute()->fetchAllAssociative());
     }
 
     /** @test */
@@ -86,10 +93,11 @@ class StorageWriterTest extends KernelTestCase
             function () {}
         );
 
+        $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('prefix_test')->where('identifier = 2')->execute()->fetchColumn(0));
-        $this->assertCount(4, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
+        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne(0));
+        $this->assertCount(4, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAssociative());
     }
 
     /** @test */
@@ -106,10 +114,11 @@ class StorageWriterTest extends KernelTestCase
             function () {}
         );
 
+        $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test2']);
 
-        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('prefix_test')->where('identifier = 2')->execute()->fetchColumn(0));
-        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetch());
+        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne(0));
+        $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAssociative());
     }
 
     /** @test */
@@ -127,8 +136,9 @@ class StorageWriterTest extends KernelTestCase
             'created_at'
         );
 
+        $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 1, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertEquals(1, $this->connection->fetchColumn("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='prefix_test_suffix'"));
+        $this->assertEquals(1, $this->connection->fetchOne("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='prefix_test_suffix'"));
     }
 }
