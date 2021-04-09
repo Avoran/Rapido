@@ -96,7 +96,7 @@ class StorageWriterTest extends KernelTestCase
         $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test']);
 
-        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne(0));
+        $this->assertEquals('test', $this->connection->createQueryBuilder()->select('f3')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne());
         $this->assertCount(4, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAssociative());
     }
 
@@ -117,7 +117,7 @@ class StorageWriterTest extends KernelTestCase
         $this->synchronizer->ensureTableExists($meta);
         $this->writer->writeRecord($meta, ['id' => 2, 'f1' => true, 'f2' => 'test2']);
 
-        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne(0));
+        $this->assertEquals('test2', $this->connection->createQueryBuilder()->select('f2')->from('prefix_test')->where('identifier = 2')->execute()->fetchOne());
         $this->assertCount(3, $this->connection->createQueryBuilder()->select('*')->from('prefix_test')->execute()->fetchAssociative());
     }
 

@@ -59,7 +59,10 @@ class DoctrineDbalStorageWriter implements StorageWriter
         if ($this->connection->getDatabasePlatform() instanceof MySqlPlatform) {
             $query = "INSERT INTO $tableName ($columnsStr) VALUES ($insertParams) ON DUPLICATE KEY UPDATE $updateParams";
         } elseif ($this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
-            $query = "INSERT INTO $tableName ($columnsStr) VALUES ($insertParams) ON CONFLICT($this->idColumnName) DO UPDATE SET $updateParams";
+            $query = "INSERT OR REPLACE INTO $tableName ($columnsStr) VALUES ($insertParams)";
+            $this->connection->executeQuery($query, $values, $types);
+
+            return;
         } else {
             throw new InvalidArgumentException('This database platform is not supported by Rapido');
         }
