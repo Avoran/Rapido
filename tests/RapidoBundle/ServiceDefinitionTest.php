@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ServiceDefinitionTest extends KernelTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
     }

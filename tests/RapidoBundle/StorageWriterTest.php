@@ -25,12 +25,12 @@ class StorageWriterTest extends KernelTestCase
     /** @var SchemaSynchronizer */
     private $synchronizer;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         unlink(__DIR__ . '/Config/sqlite.db');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $container = self::bootKernel()->getContainer();
         $this->writer = $container->get('rapido.storage_writer');
